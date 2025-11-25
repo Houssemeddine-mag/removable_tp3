@@ -18,25 +18,31 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r tp3/requirements.txt
 
+      - name: Create test settings
+        working-directory: ./tp3/tp3
+        run: |
+          cat > settings_test.py << 'EOF'
+          from .settings import *
+
+          DATABASES = {
+              'default': {
+                  'ENGINE': 'django.db.backends.sqlite3',
+                  'NAME': ':memory:',
+              }
+          }
+          EOF
+
       - name: Run migrations
         working-directory: ./tp3
-        env:
-          DJANGO_SETTINGS_MODULE: tp3.settings
-          DATABASE_URL: sqlite:///db.sqlite3
-        run: |
-          python manage.py makemigrations
-          python manage.py migrate
+        run: python manage.py migrate --settings=tp3.settings_test
 
       - name: Run tests
         working-directory: ./tp3
-        env:
-          DJANGO_SETTINGS_MODULE: tp3.settings
-          DATABASE_URL: sqlite:///db.sqlite3
-        run: python manage.py test university_app --verbosity=2
+        run: python manage.py test university_app --settings=tp3.settings_test --verbosity=2
