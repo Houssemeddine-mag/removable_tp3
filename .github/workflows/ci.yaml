@@ -27,8 +27,16 @@ jobs:
 
       - name: Run migrations
         working-directory: ./tp3
-        run: python manage.py migrate
+        env:
+          DJANGO_SETTINGS_MODULE: tp3.settings
+          DATABASE_URL: sqlite:///db.sqlite3
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
 
       - name: Run tests
         working-directory: ./tp3
+        env:
+          DJANGO_SETTINGS_MODULE: tp3.settings
+          DATABASE_URL: sqlite:///db.sqlite3
         run: python manage.py test university_app --verbosity=2
