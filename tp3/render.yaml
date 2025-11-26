@@ -1,13 +1,12 @@
 services:
   - type: web
     name: django-university-app
-    runtime: docker
-    dockerfilePath: ./tp3/Dockerfile
-    dockerContext: ./tp3
+    runtime: python
     region: oregon
     plan: free
     branch: main
-    healthCheckPath: /
+    buildCommand: pip install -r tp3/requirements.txt
+    startCommand: python tp3/manage.py migrate && python tp3/manage.py collectstatic --noinput --clear && gunicorn tp3.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PORT
         value: 8000
