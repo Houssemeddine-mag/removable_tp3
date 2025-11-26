@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,16 +76,29 @@ WSGI_APPLICATION = 'tp3.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Database configuration
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'djangotp',
-        'USER': 'postgres',
-        'PASSWORD': 'Its#me@yes.com',
-        'HOST': 'localhost',
+        'NAME': 'spring_vlc9',
+        'USER': 'spring_vlc9_user',
+        'PASSWORD': '293WYiOJjjKvAKFbTxmnt8GzlYORJTfR',
+        'HOST': 'dpg-d4j32gvpm1nc73dot76g-a.oregon-postgres.render.com',
         'PORT': '5432',
+        'OPTIONS': {
+            'connect_timeout': 30,
+        },
+        'CONN_MAX_AGE': 600,  # Connection pooling (600 seconds)
     }
 }
+
+# Override with DATABASE_URL if present (for Render)
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(
+        default=os.environ['DATABASE_URL'],
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 
 # Password validation
@@ -126,3 +141,26 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.environ.get('LOG_LEVEL', 'INFO'),
+    },
+}
