@@ -29,13 +29,18 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy application code
-COPY . .
+# Copy Django project files (manage.py, tp3/, university_app/)
+COPY manage.py .
+COPY tp3/ ./tp3/
+COPY university_app/ ./university_app/
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 ENV PYTHONPATH=/app
+
+# Expose port
+EXPOSE 8000
 
 # Run migrations, collect static files and start server
 CMD python manage.py migrate && \
