@@ -1,7 +1,7 @@
-# Stage 1: Build
+# Stage 1: Builder
 FROM python:3.11-slim AS builder
 
-WORKDIR /tp3
+WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -15,10 +15,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+
 # Stage 2: Runtime
 FROM python:3.11-slim
 
-WORKDIR /tp3
+WORKDIR /app
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
@@ -29,18 +30,17 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy all project files from current directory (which is tp3/ due to dockerContext)
+# Copy project files (context = ./tp3)
 COPY . .
 
-# Set environment variables
+# Environment
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
-ENV PYTHONPATH=/tp3
+ENV PYTHONPATH=/app
 
-# Expose port
 EXPOSE 8000
 
-# Run migrations, collect static files and start server
+# Run migrations, collect static files, start gunicorn
 CMD python manage.py migrate && \
     python manage.py collectstatic --noinput --clear && \
-    gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 tp3.wsgi:tp3lication
+    gunicorn tp3.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120

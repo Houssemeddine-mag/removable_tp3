@@ -2,7 +2,7 @@ services:
   - type: web
     name: django-university-app
     runtime: docker
-    dockerfilePath: ./tp3/dockerfile
+    dockerfilePath: ./tp3/Dockerfile
     dockerContext: ./tp3
     region: oregon
     plan: free
@@ -25,7 +25,7 @@ services:
         value: 1
       - key: LOG_LEVEL
         value: INFO
-        
+
 databases:
   - name: spring_vlc9
     databaseName: spring_vlc9
