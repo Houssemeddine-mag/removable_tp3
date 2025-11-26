@@ -32,16 +32,12 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
-
-# Expose port (Render will override with PORT env var)
-EXPOSE 8000
-
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
+ENV PYTHONPATH=/app
 
-# Run migrations and start server
+# Run migrations, collect static files and start server
 CMD python manage.py migrate && \
-    gunicorn tp3.wsgi:application --bind 0.0.0.0:$PORT
+    python manage.py collectstatic --noinput --clear && \
+    gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 tp3.wsgi:application
