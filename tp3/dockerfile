@@ -1,7 +1,7 @@
 # Stage 1: Build
 FROM python:3.11-slim AS builder
 
-WORKDIR /app
+WORKDIR /tp3
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Stage 2: Runtime
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /tp3
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
@@ -35,7 +35,7 @@ COPY . .
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/tp3
 
 # Expose port
 EXPOSE 8000
@@ -43,4 +43,4 @@ EXPOSE 8000
 # Run migrations, collect static files and start server
 CMD python manage.py migrate && \
     python manage.py collectstatic --noinput --clear && \
-    gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 tp3.wsgi:application
+    gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 tp3.wsgi:tp3lication
