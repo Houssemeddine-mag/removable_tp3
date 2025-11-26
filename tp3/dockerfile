@@ -29,10 +29,8 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Copy Django project files (manage.py, tp3/, university_app/)
-COPY manage.py .
-COPY tp3/ ./tp3/
-COPY university_app/ ./university_app/
+# Copy all project files from current directory (which is tp3/ due to dockerContext)
+COPY . .
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
